@@ -66,7 +66,7 @@ describe('agenda e datas', () => {
     expect(result.events.every((e) => dateKey(e.start) === '2026-09-25')).toBe(true)
   })
   it('semana começa segunda e muda no limite de mês e ano', () => {
-    expect(weekDays(new Date(2027, 0, 3)).map((day) => dateKey(day))).toEqual([
+    expect(weekDays(new Date('2027-01-03T12:00:00-03:00')).map((day) => dateKey(day))).toEqual([
       '2026-12-28',
       '2026-12-29',
       '2026-12-30',
@@ -75,10 +75,10 @@ describe('agenda e datas', () => {
       '2027-01-02',
       '2027-01-03',
     ])
-    expect(dateKey(weekDays(new Date(2027, 0, 4))[0])).toBe('2027-01-04')
+    expect(dateKey(weekDays(new Date('2027-01-04T12:00:00-03:00'))[0])).toBe('2027-01-04')
     const oldRecords = ['2026-12-28', '2026-12-30']
     expect(
-      weekDays(new Date(2027, 0, 4)).filter((day) => oldRecords.includes(dateKey(day))),
+      weekDays(new Date('2027-01-04T12:00:00-03:00')).filter((day) => oldRecords.includes(dateKey(day))),
     ).toHaveLength(0)
   })
   it('formata datas de tarefas como dias civis no fuso configurado', () => {

@@ -61,7 +61,7 @@ it('usa três linhas com altura de 900px e reage ao redimensionamento', () => {
   expect(result.current.size).toBe(2)
 })
 it('marca e desmarca sem duplicar e não permite futuro ou outra semana', () => {
-  const now = new Date(2026, 8, 24)
+  const now = new Date('2026-09-24T12:00:00-03:00')
   const habits = [{ id: 'a', name: 'Treino', target: 5, completedDays: ['2026-09-14'] }]
   const marked = toggleHabitDay(habits, 'a', '2026-09-24', now)
   expect(marked[0].completedDays).toEqual(['2026-09-14', '2026-09-24'])
