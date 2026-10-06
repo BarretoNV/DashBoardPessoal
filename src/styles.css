@@ -971,8 +971,12 @@ ul {
   animation: task-list-reveal 0.28s ease-out both;
 }
 @keyframes task-list-reveal {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .task-list > li {
   position: relative;
@@ -1980,4 +1984,56 @@ ul {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+.access-panel {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: #101218;
+  color: #f4f4f5;
+  text-align: center;
+}
+.access-panel button,
+.primary-action,
+.sync-bar button,
+.backup-controls button {
+  padding: 0.6rem 1rem;
+  border: 1px solid #6b7280;
+  border-radius: 0.5rem;
+  background: #20242c;
+  color: #fff;
+  cursor: pointer;
+}
+.sync-bar {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  max-width: calc(100vw - 1rem);
+  padding: 0.5rem 0.75rem;
+  background: #101218ed;
+  color: #eee;
+  border: 1px solid #596171;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+}
+.backup-controls {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #596171;
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.75rem;
+}
+.backup-controls label {
+  display: grid;
+  gap: 0.5rem;
 }

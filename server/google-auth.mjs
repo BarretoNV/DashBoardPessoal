@@ -1,12 +1,15 @@
 import { randomBytes } from 'node:crypto'
 
 export class GoogleAuthManager {
-  constructor({ createOAuthClient, store, redirectUri }) {
+  constructor({ createOAuthClient, store, redirectUri, requestStore, ownerId, clientId }) {
     this.createOAuthClient = createOAuthClient
     this.store = store
     this.redirectUri = redirectUri
     this.requests = new Map()
     this.cachedClient = null
+    this.requestStore = requestStore
+    this.ownerId = ownerId
+    this.clientId = clientId
   }
 
   async status() {
@@ -34,14 +37,18 @@ export class GoogleAuthManager {
     for (const [key, request] of this.requests) {
       if (now - request.createdAt > 10 * 60 * 1000) this.requests.delete(key)
     }
-    this.requests.set(state, { codeVerifier, scopes, createdAt: now })
+    const nonce = randomBytes(32).toString('hex')
+    const pending = { codeVerifier, scopes, createdAt: now, nonce, kind: 'integration' }
+    if (this.requestStore) await this.requestStore.putRequest(state, pending, this.ownerId)
+    else this.requests.set(state, pending)
     return {
       state,
       url: client.generateAuthUrl({
         access_type: 'offline',
         prompt: 'consent',
         include_granted_scopes: true,
-        scope: scopes,
+        scope: this.requestStore ? [...scopes, 'openid', 'email', 'profile'] : scopes,
+        nonce,
         state,
         code_challenge: codeChallenge,
         code_challenge_method: 'S256',
@@ -50,9 +57,15 @@ export class GoogleAuthManager {
   }
 
   async exchangeCode(code, state) {
-    const request = this.requests.get(state)
+    const request = this.requestStore
+      ? await this.requestStore.takeRequest(state)
+      : this.requests.get(state)
     this.requests.delete(state)
-    if (!request || Date.now() - request.createdAt > 10 * 60 * 1000) {
+    if (
+      !request ||
+      (this.requestStore && (request.ownerId !== this.ownerId || request.kind !== 'integration')) ||
+      Date.now() - request.createdAt > 10 * 60 * 1000
+    ) {
       throw new Error('Solicitação OAuth inválida ou expirada.')
     }
     const previous = await this.store.read()
@@ -62,14 +75,32 @@ export class GoogleAuthManager {
       codeVerifier: request.codeVerifier,
       redirect_uri: this.redirectUri,
     })
+    if (this.requestStore) {
+      const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: this.clientId,
+      })
+      const identity = ticket.getPayload()
+      if (
+        !identity ||
+        identity.sub !== this.ownerId ||
+        identity.nonce !== request.nonce ||
+        !identity.email_verified
+      )
+        throw new Error('Conta Google não autorizada.')
+    }
     const refreshToken = tokens.refresh_token ?? previous?.refreshToken
     if (!refreshToken) {
-      throw new Error('O Google não retornou um refresh token. Revogue o acesso e conecte novamente.')
+      throw new Error(
+        'O Google não retornou um refresh token. Revogue o acesso e conecte novamente.',
+      )
     }
     const granted = new Set([
       ...(previous?.scopes ?? []),
       ...request.scopes,
-      ...String(tokens.scope ?? '').split(' ').filter(Boolean),
+      ...String(tokens.scope ?? '')
+        .split(' ')
+        .filter(Boolean),
     ])
     await this.store.write({ refreshToken, scopes: [...granted] })
     client.setCredentials({ ...tokens, refresh_token: refreshToken })

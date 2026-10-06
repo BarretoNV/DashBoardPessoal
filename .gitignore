@@ -6,3 +6,5 @@ artifacts/
 .env.*
 !.env.example
 .data/
+.vercel/
+.audit-install/

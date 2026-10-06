@@ -9,7 +9,7 @@ export interface GoogleStatus {
 }
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
+  const response = await cloudFetch(path, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...init?.headers },
   })
@@ -37,3 +37,4 @@ export const googleAuthService = {
     await api('/api/auth/logout', { method: 'POST', body: '{}' })
   },
 }
+import { cloudFetch } from './cloudDashboard'

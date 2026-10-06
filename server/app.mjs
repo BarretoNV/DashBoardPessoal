@@ -2,12 +2,17 @@ import express from 'express'
 
 function safeError(error) {
   if (error?.status === 401) return { status: 401, message: 'Google não conectado.' }
-  if (error?.response?.status === 401) return { status: 401, message: 'A conexão Google precisa ser refeita.' }
+  if (error?.response?.status === 401)
+    return { status: 401, message: 'A conexão Google precisa ser refeita.' }
   return { status: 502, message: 'O Google está temporariamente indisponível.' }
 }
 
 function cookie(request, name) {
-  const entry = request.get('cookie')?.split(';').map((value) => value.trim()).find((value) => value.startsWith(`${name}=`))
+  const entry = request
+    .get('cookie')
+    ?.split(';')
+    .map((value) => value.trim())
+    .find((value) => value.startsWith(`${name}=`))
   return entry ? decodeURIComponent(entry.slice(name.length + 1)) : ''
 }
 
@@ -15,10 +20,20 @@ function validDateKey(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
   const [year, month, day] = value.split('-').map(Number)
   const date = new Date(Date.UTC(year, month - 1, day))
-  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+  return (
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+  )
 }
 
-export function createApp({ authManager, gateway, configured, origins, appOrigin, scopes }) {
+export function createApp({
+  authManager,
+  gateway,
+  configured,
+  origins,
+  appOrigin,
+  scopes,
+  secure = false,
+}) {
   const app = express()
   app.disable('x-powered-by')
   app.use(express.json({ limit: '16kb' }))
@@ -56,7 +71,7 @@ export function createApp({ authManager, gateway, configured, origins, appOrigin
     response.cookie('oauth_state', authorization.state, {
       httpOnly: true,
       sameSite: 'lax',
-      secure: false,
+      secure,
       maxAge: 10 * 60 * 1000,
       path: '/',
     })
@@ -132,7 +147,9 @@ export function createApp({ authManager, gateway, configured, origins, appOrigin
       return
     }
     try {
-      response.status(201).json(await gateway.createTask({ title, due: due || undefined, taskListId }))
+      response
+        .status(201)
+        .json(await gateway.createTask({ title, due: due || undefined, taskListId }))
     } catch (error) {
       const safe = safeError(error)
       response.status(safe.status).json({ error: safe.message })
@@ -159,11 +176,17 @@ export function createApp({ authManager, gateway, configured, origins, appOrigin
       return
     }
     try {
-      response.json(await gateway.updateTask(request.params.id, {
-        ...(hasTitle ? { title } : {}),
-        ...(hasDue ? { due } : {}),
-        ...(hasCompleted ? { completed: body.completed } : {}),
-      }, taskListId))
+      response.json(
+        await gateway.updateTask(
+          request.params.id,
+          {
+            ...(hasTitle ? { title } : {}),
+            ...(hasDue ? { due } : {}),
+            ...(hasCompleted ? { completed: body.completed } : {}),
+          },
+          taskListId,
+        ),
+      )
     } catch (error) {
       const safe = safeError(error)
       response.status(safe.status).json({ error: safe.message })

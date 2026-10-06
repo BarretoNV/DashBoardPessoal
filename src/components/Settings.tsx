@@ -5,6 +5,8 @@ import { useDashboardSettings } from '../hooks/useDashboardSettings'
 import { useGoogleConnection } from '../hooks/useGoogleConnection'
 import { dateKey, dateLabel, weekDays } from '../services/dateService'
 import { TaskCreateForm } from './TaskCreateForm'
+import { BackupControls } from './BackupControls'
+import { getCloudSnapshot } from '../services/cloudDashboard'
 export type SettingsTab = 'settings' | 'tasks' | 'habits'
 interface Props {
   initialTab: SettingsTab
@@ -93,7 +95,10 @@ export function Settings({
           ))}
         </nav>
         {tab === 'settings' ? (
-          <Preferences />
+          <>
+            <Preferences />
+            <BackupControls />
+          </>
         ) : tab === 'tasks' ? (
           <TaskEditor
             tasks={tasks}
@@ -109,8 +114,12 @@ export function Settings({
         )}
         <p className="local-note" role="status">
           {saved
-            ? 'Alterações salvas neste navegador.'
-            : 'Não foi possível salvar. Suas alterações durarão apenas nesta sessão.'}
+            ? getCloudSnapshot().mode === 'cloud'
+              ? 'Alterações sincronizadas entre dispositivos.'
+              : 'Alterações salvas neste navegador.'
+            : getCloudSnapshot().mode === 'cloud'
+              ? 'Consulte o estado da sincronização no painel.'
+              : 'Não foi possível salvar. Suas alterações durarão apenas nesta sessão.'}
         </p>
       </div>
     </dialog>
@@ -176,16 +185,19 @@ function Preferences() {
               checked={
                 item.key === 'animatedBackground'
                   ? settings.animatedBackground !== false
-                  : item.key === 'autoAmbient' || item.key === 'autoRotateTaskLists' || item.key === 'autoScrollTasks'
+                  : item.key === 'autoAmbient' ||
+                      item.key === 'autoRotateTaskLists' ||
+                      item.key === 'autoScrollTasks'
                     ? settings[item.key] !== false
-                  : settings[item.key]
+                    : settings[item.key]
               }
               onChange={(event) => update(item.key, event.target.checked)}
             />
           </label>
         ))}
         <p className="field-hint">
-          O modo ambiente oculta controles após inatividade. As listas com pendências podem alternar a cada 30 segundos.
+          O modo ambiente oculta controles após inatividade. As listas com pendências podem alternar
+          a cada 30 segundos.
         </p>
       </fieldset>
       <label className="color-field">

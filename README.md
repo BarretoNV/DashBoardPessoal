@@ -6,7 +6,7 @@ Sem uma conexão Google, a agenda de demonstração e as tarefas locais continua
 
 ## Executar
 
-Use Node.js 22.12 ou superior.
+Use Node.js 24.15.0 ou superior dentro da versão 24.x.
 
 ```sh
 npm install
@@ -152,10 +152,10 @@ npm run test:auth-browser
 
 Os testes cobrem armazenamento criptografado, restauração após reiniciar o servidor, renovação de access token, `invalid_grant`, logout, proteção por origem, F5, fechamento/reabertura da dashboard, Calendar, Tasks, fallback local e o layout responsivo.
 
-## Publicação futura
+## Publicação na Vercel
 
-A aplicação deixou de ser apenas estática. Uma publicação futura precisa hospedar a API Node e usar armazenamento persistente seguro para o refresh token; o arquivo local `.data` não serve para funções serverless efêmeras. Também será necessário cadastrar o novo callback OAuth. A publicação não faz parte desta entrega local.
+A aplicação possui frontend Vite e API serverless no mesmo projeto Vercel, login exclusivo por conta Google e sincronização pelo Neon Postgres. Consulte [DEPLOYMENT.md](DEPLOYMENT.md) para configurar o banco, as variáveis, os callbacks Google, aplicar as migrações e importar os dados do localhost. O modo local continua disponível.
 
 Documentação: [Google Identity Services — code model](https://developers.google.com/identity/oauth2/web/guides/use-code-model), [OAuth 2.0 para aplicações web](https://developers.google.com/identity/protocols/oauth2/web-server), [Google Calendar API](https://developers.google.com/workspace/calendar/api/auth), [Google Tasks API](https://developers.google.com/workspace/tasks/auth) e [Open-Meteo](https://open-meteo.com/en/docs).
-#   D a s h B o a r d P e s s o a l  
- 
+
+# DashBoardPessoal

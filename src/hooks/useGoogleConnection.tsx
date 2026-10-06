@@ -1,19 +1,9 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { IntegrationPreferences } from '../types'
-import {
-  googleAuthService,
-  GOOGLE_SCOPES,
-  type GoogleStatus,
-} from '../services/googleAuthService'
+import { googleAuthService, GOOGLE_SCOPES, type GoogleStatus } from '../services/googleAuthService'
 import { validIntegrationPreferences } from '../services/validation'
 import { usePersistentState } from './usePersistentState'
+import { flushCloud, getCloudSnapshot } from '../services/cloudDashboard'
 import { storageService } from '../services/storageService'
 
 type GoogleFeature = 'calendar' | 'tasks'
@@ -73,11 +63,17 @@ function useConnectionState() {
           ? { ...preferences.value, calendarEnabled: true }
           : { ...preferences.value, tasksEnabled: true }
       preferences.setValue(next)
-      storageService.write('integrations', next)
-      googleAuthService.authorize([
-        ...(next.calendarEnabled ? ['calendar' as const] : []),
-        ...(next.tasksEnabled ? ['tasks' as const] : []),
-      ])
+      if (getCloudSnapshot().mode !== 'cloud') storageService.write('integrations', next)
+      try {
+        await flushCloud()
+        googleAuthService.authorize([
+          ...(next.calendarEnabled ? ['calendar' as const] : []),
+          ...(next.tasksEnabled ? ['tasks' as const] : []),
+        ])
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Não foi possível conectar.')
+        setBusy(null)
+      }
     },
     [preferences],
   )
@@ -120,9 +116,7 @@ const GoogleConnectionContext = createContext<Connection | null>(null)
 export function GoogleConnectionProvider({ children }: { children: ReactNode }) {
   const state = useConnectionState()
   return (
-    <GoogleConnectionContext.Provider value={state}>
-      {children}
-    </GoogleConnectionContext.Provider>
+    <GoogleConnectionContext.Provider value={state}>{children}</GoogleConnectionContext.Provider>
   )
 }
 export function useGoogleConnection() {

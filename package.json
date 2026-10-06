@@ -16,11 +16,14 @@
     "test:browser": "node scripts/browser-check.mjs",
     "test:task-scroll-browser": "node scripts/task-scroll-browser-check.mjs",
     "test:auth-browser": "node scripts/auth-browser-check.mjs",
-    "format": "prettier --write src server scripts *.json *.ts *.js index.html README.md"
+    "format": "prettier --write src server scripts *.json *.ts *.js index.html README.md",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
+    "test:cloud-browser": "node scripts/cloud-browser-check.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
+    "@neondatabase/serverless": "^1.2.0",
     "express": "^5.2.1",
     "googleapis": "^182.0.0",
     "lucide-react": "^1.48.0",
@@ -28,6 +31,7 @@
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
@@ -47,5 +51,8 @@
     "typescript-eslint": "^8.70.1",
     "vite": "^8.3.1",
     "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=24.15.0 <25"
   }
 }

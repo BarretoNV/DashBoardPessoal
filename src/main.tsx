@@ -9,12 +9,15 @@ import './styles.css'
 import App from './App'
 import { SettingsProvider } from './hooks/useDashboardSettings'
 import { GoogleConnectionProvider } from './hooks/useGoogleConnection'
+import { PanelAccess } from './components/PanelAccess'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <SettingsProvider>
-      <GoogleConnectionProvider>
-        <App />
-      </GoogleConnectionProvider>
-    </SettingsProvider>
+    <PanelAccess>
+      <SettingsProvider>
+        <GoogleConnectionProvider>
+          <App />
+        </GoogleConnectionProvider>
+      </SettingsProvider>
+    </PanelAccess>
   </React.StrictMode>,
 )
