@@ -39,6 +39,7 @@ export function validSettings(data: unknown): data is DashboardSettings {
     (data.animatedBackground === undefined || typeof data.animatedBackground === 'boolean') &&
     (data.autoAmbient === undefined || typeof data.autoAmbient === 'boolean') &&
     (data.autoRotateTaskLists === undefined || typeof data.autoRotateTaskLists === 'boolean') &&
+    (data.hideCompletedTaskLists === undefined || typeof data.hideCompletedTaskLists === 'boolean') &&
     (data.autoScrollTasks === undefined || typeof data.autoScrollTasks === 'boolean') &&
     typeof data.accent === 'string' &&
     /^#[0-9a-f]{6}$/i.test(data.accent) &&

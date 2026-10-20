@@ -175,6 +175,7 @@ function Preferences() {
             { key: 'animatedBackground', label: 'Fundo animado' },
             { key: 'autoAmbient', label: 'Modo ambiente após 2 min' },
             { key: 'autoRotateTaskLists', label: 'Alternar listas automaticamente' },
+            { key: 'hideCompletedTaskLists', label: 'Ocultar listas totalmente concluídas' },
             { key: 'autoScrollTasks', label: 'Rolar tarefas automaticamente' },
           ] as const
         ).map((item) => (
@@ -189,7 +190,7 @@ function Preferences() {
                       item.key === 'autoRotateTaskLists' ||
                       item.key === 'autoScrollTasks'
                     ? settings[item.key] !== false
-                    : settings[item.key]
+                    : settings[item.key] === true
               }
               onChange={(event) => update(item.key, event.target.checked)}
             />

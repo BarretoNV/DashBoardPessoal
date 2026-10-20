@@ -80,7 +80,12 @@ export function TaskList({
   const previousActivity = useRef(activityRevision)
   const dwellEligible = useRef(false)
   const pending = tasks.filter((task) => !task.completed).length
-  const ordered = taskService.ordered(tasks)
+  const hideCompletedLists = settings.hideCompletedTaskLists === true
+  const visibleLists = lists.filter((list) => {
+    const items = tasksByList[list.id]
+    return !hideCompletedLists || !items?.length || items.some((task) => !task.completed)
+  })
+  const ordered = hideCompletedLists && tasks.length > 0 && pending === 0 ? [] : taskService.ordered(tasks)
   const selectedList = lists.find((list) => list.id === selectedListId)
   const eligibleLists = lists.filter((list) =>
     (tasksByList[list.id] ?? []).some((task) => !task.completed),
@@ -97,6 +102,12 @@ export function TaskList({
     enabled: autoScroll,
     paused: interactionPaused,
   })
+  useEffect(() => {
+    if (hideCompletedLists && !loading && !visibleLists.some((list) => list.id === selectedListId)) {
+      const next = visibleLists[0]
+      if (next) onSelectList(next.id)
+    }
+  }, [hideCompletedLists, loading, visibleLists, selectedListId, onSelectList])
   useLayoutEffect(() => {
     if (restore.current) inputs.current.get(restore.current)?.focus({ preventScroll: true })
     restore.current = null
@@ -193,8 +204,8 @@ export function TaskList({
     return () => window.clearTimeout(timer)
   }, [autoShownId, onMarkListSeen, pageVisible, selectedListId, settingsOpen, unreadListIds])
   const moveListFocus = (id: string, direction: number) => {
-    const index = lists.findIndex((list) => list.id === id)
-    const next = lists[(index + direction + lists.length) % lists.length]
+    const index = visibleLists.findIndex((list) => list.id === id)
+    const next = visibleLists[(index + direction + visibleLists.length) % visibleLists.length]
     if (next) listButtons.current.get(next.id)?.focus()
   }
   useEffect(() => {
@@ -249,11 +260,11 @@ export function TaskList({
               aria-expanded={selectingList}
               onClick={() => setSelectingList((open) => !open)}
               onKeyDown={(event) => {
-                if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && lists.length) {
+                if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && visibleLists.length) {
                   event.preventDefault()
                   setSelectingList(true)
                   requestAnimationFrame(() => listButtons.current.get(
-                    event.key === 'ArrowDown' ? lists[0].id : lists[lists.length - 1].id,
+                    event.key === 'ArrowDown' ? visibleLists[0].id : visibleLists[visibleLists.length - 1].id,
                   )?.focus())
                 }
               }}
@@ -263,7 +274,7 @@ export function TaskList({
             </button>
             {selectingList ? (
               <span className="task-list-menu" role="menu" aria-label="Listas do Google Tasks">
-                {lists.map((list) => {
+                {visibleLists.map((list) => {
                   const listPending = (tasksByList[list.id] ?? []).filter((task) => !task.completed).length
                   const hasNew = unreadListIds.includes(list.id)
                   return (

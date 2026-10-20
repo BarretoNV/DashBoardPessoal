@@ -26,6 +26,7 @@ export function useAutoTaskScroll({
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
+  const scrollLimit = useRef(0)
   const phase = useRef<Phase>('top')
   const phaseElapsed = useRef(0)
   const scrollPosition = useRef(0)
@@ -47,13 +48,20 @@ export function useAutoTaskScroll({
       const pendingItems = viewport.querySelectorAll<HTMLElement>('[data-task-pending="true"]')
       const lastPending = pendingItems.item(pendingItems.length - 1)
       const pendingBottom = lastPending
-        ? lastPending.offsetTop + lastPending.offsetHeight
+        ? lastPending.getBoundingClientRect().bottom - viewport.getBoundingClientRect().top + viewport.scrollTop
         : 0
-      setHasOverflow(
-        pendingItems.length > 0
-          ? pendingBottom > viewport.clientHeight + 1
-          : viewport.children.length === 0 && viewport.scrollHeight > viewport.clientHeight + 1,
-      )
+      scrollLimit.current = Math.max(0, Math.min(
+        viewport.scrollHeight - viewport.clientHeight,
+        pendingBottom - viewport.clientHeight,
+      ))
+      setHasOverflow(scrollLimit.current > 1)
+      if (viewport.scrollTop > scrollLimit.current) {
+        viewport.scrollTop = scrollLimit.current
+        scrollPosition.current = scrollLimit.current
+      }
+      viewport.classList.remove('task-list-fading')
+      phase.current = 'top'
+      phaseElapsed.current = 0
     }
     const frame = requestAnimationFrame(measure)
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
@@ -87,7 +95,7 @@ export function useAutoTaskScroll({
         phase.current = 'scroll'
         phaseElapsed.current = 0
       } else if (phase.current === 'scroll') {
-        const bottom = Math.max(0, viewport.scrollHeight - viewport.clientHeight)
+        const bottom = scrollLimit.current
         scrollPosition.current = Math.min(
           bottom,
           scrollPosition.current + SPEED_PX_PER_SECOND * delta / 1000,

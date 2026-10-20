@@ -8,6 +8,12 @@ function viewport(overflow = true) {
     clientHeight: { configurable: true, value: 100 },
     scrollHeight: { configurable: true, value: overflow ? 200 : 100 },
   })
+  if (overflow) {
+    const pending = document.createElement('li')
+    pending.dataset.taskPending = 'true'
+    pending.getBoundingClientRect = () => ({ bottom: 200 } as DOMRect)
+    element.append(pending)
+  }
   return element
 }
 
@@ -89,6 +95,7 @@ it('mantém a posição pausada e desliga a animação com movimento reduzido', 
 
 it('não inicia rolagem quando apenas tarefas concluídas causam overflow', () => {
   const element = viewport()
+  element.replaceChildren()
   const pending = document.createElement('li')
   pending.dataset.taskPending = 'true'
   Object.defineProperties(pending, {
@@ -107,5 +114,32 @@ it('não inicia rolagem quando apenas tarefas concluídas causam overflow', () =
   act(() => vi.advanceTimersByTime(10000))
   expect(element.scrollTop).toBe(0)
   expect(result.current.hasOverflow).toBe(false)
+  expect(result.current.isAutoScrolling).toBe(false)
+})
+
+ it('para na última pendente e retorna sem percorrer as concluídas', () => {
+  const element = viewport()
+  Object.defineProperty(element, 'scrollHeight', { value: 1000 })
+  const { result } = renderHook(() => useAutoTaskScroll({
+    viewportRef: { current: element }, resetKey: 'mixed', measureKey: 'mixed',
+    enabled: true, paused: false,
+  }))
+  act(() => vi.advanceTimersByTime(20))
+  act(() => vi.advanceTimersByTime(14000))
+  expect(element.scrollTop).toBe(100)
+  act(() => vi.advanceTimersByTime(4000))
+  expect(element.scrollTop).toBe(0)
+  expect(result.current.lastCompletedKey).toBe('mixed')
+})
+
+it('não rola listas totalmente concluídas', () => {
+  const element = viewport()
+  element.firstElementChild?.removeAttribute('data-task-pending')
+  const { result } = renderHook(() => useAutoTaskScroll({
+    viewportRef: { current: element }, resetKey: 'done', measureKey: 'done',
+    enabled: true, paused: false,
+  }))
+  act(() => vi.advanceTimersByTime(20000))
+  expect(element.scrollTop).toBe(0)
   expect(result.current.isAutoScrolling).toBe(false)
 })

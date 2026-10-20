@@ -44,6 +44,7 @@ export interface DashboardSettings {
   autoAmbient?: boolean
   autoRotateTaskLists?: boolean
   autoScrollTasks?: boolean
+  hideCompletedTaskLists?: boolean
   animatedBackground?: boolean
   location: WeatherLocation | null
   timezone?: string
