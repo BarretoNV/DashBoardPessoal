@@ -1,6 +1,6 @@
 # Centro de Comando — Painel Pessoal
 
-Dashboard noturna para permanecer aberta em uma TV ao lado do Audible. O projeto usa React, TypeScript, Vite, Tailwind CSS e uma API Node.js/Express local. O clima vem do Open-Meteo; Google Calendar e Google Tasks são integrações opcionais.
+Dashboard noturna para permanecer aberta em uma TV. O projeto usa React, TypeScript, Vite, Tailwind CSS e uma API Node.js/Express local. O clima vem do Open-Meteo; Google Calendar e Google Tasks são integrações opcionais.
 
 Sem uma conexão Google, a agenda de demonstração e as tarefas locais continuam funcionando. A interface identifica quando está mostrando **Google Calendar**, **Google Tasks** ou **Dados locais**.
 
