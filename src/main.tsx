@@ -10,6 +10,8 @@ import App from './App'
 import { SettingsProvider } from './hooks/useDashboardSettings'
 import { GoogleConnectionProvider } from './hooks/useGoogleConnection'
 import { PanelAccess } from './components/PanelAccess'
+import { registerServiceWorker } from './registerServiceWorker'
+registerServiceWorker()
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <PanelAccess>

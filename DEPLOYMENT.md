@@ -79,3 +79,14 @@ Os testes automatizados executam as migrações em PostgreSQL embarcado, além d
 Sem `APP_MODE=cloud`, o servidor continua em 8787, com Vite em 5173, dados no navegador e sessão Google no arquivo local criptografado. A API local permanece vinculada a `127.0.0.1`.
 
 Para testar login e sincronização, definir `APP_MODE=cloud`, `DATABASE_URL` de desenvolvimento, e-mail autorizado e ambos os callbacks locais de `.env.example`. Aplicar as migrações e executar `npm run dev`. Nunca usar o banco de produção para esse modo de desenvolvimento.
+
+## Verificação da PWA após publicar
+
+- Confirmar `/manifest.webmanifest` com `Content-Type: application/manifest+json`, ícones públicos e `/sw.js` com MIME JavaScript e `Cache-Control: no-cache, max-age=0, must-revalidate`.
+- Chrome Android real: instalar pelo menu, fechar e abrir pelo ícone; conferir ausência de barra de endereço, retrato/paisagem, recortes, gestos, configurações e formulários com teclado aberto.
+- Verificar sessão existente, login Google e retorno ao painel, Calendar/Tasks, hábitos e logout. A emulação automatizada usa respostas sintéticas e não valida consentimento Google real.
+- Após uma abertura online, ativar modo avião e reabrir: conferir aviso offline; reconectar e usar Tentar novamente. Sem visita anterior, o Chrome pode apresentar seu próprio erro de conexão.
+- Perder conexão durante uso não deve recarregar o painel nem descartar alterações pendentes. Conferir Cache Storage: somente `/offline.html`, sem respostas de API.
+- Publicar uma segunda versão de teste em homologação, incrementar a versão offline e reabrir online: conferir nova versão sem reinstalação e remoção do cache antigo. O teste local também simula a atualização do worker.
+
+Não são necessárias migrações de banco ou mudanças em callbacks OAuth. A instalação depende de HTTPS; localhost é exceção para testes no computador. Um endereço HTTP da rede local no celular não substitui a hospedagem HTTPS.

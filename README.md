@@ -159,3 +159,15 @@ A aplicação possui frontend Vite e API serverless no mesmo projeto Vercel, log
 Documentação: [Google Identity Services — code model](https://developers.google.com/identity/oauth2/web/guides/use-code-model), [OAuth 2.0 para aplicações web](https://developers.google.com/identity/protocols/oauth2/web-server), [Google Calendar API](https://developers.google.com/workspace/calendar/api/auth), [Google Tasks API](https://developers.google.com/workspace/tasks/auth) e [Open-Meteo](https://open-meteo.com/en/docs).
 
 # DashBoardPessoal
+
+## Instalar no Android (PWA)
+
+No Chrome do Android, acesse o domínio HTTPS do painel e use **Menu → Instalar app / Adicionar à tela inicial**. Abra pelo ícone **Centro pessoal**. O manifesto solicita tela cheia, com orientação livre; o Android pode revelar barras temporariamente durante gestos. Não há botão ou convite de instalação dentro da dashboard.
+
+A instalação mantém o login e as integrações no mesmo domínio. Telas externas do Google podem mostrar a interface do navegador. A primeira abertura e os dados do painel exigem internet.
+
+Após uma visita online com o service worker ativo, abrir o app sem conexão mostra **Sem conexão** e **Tentar novamente**. Só essa página estática fica no Cache Storage: dados pessoais, APIs, autenticação, assets da aplicação e vídeo não são guardados pelo worker. A PWA não adiciona edição ou sincronização offline. Se perder conexão com o painel aberto, mantenha a janela aberta até sincronizar alterações pendentes.
+
+O service worker só é registrado em produção (`npm run build`). Atualizações do site chegam sem reinstalar o app; não há recarga automática de janelas abertas. Ao alterar a página offline, incremente a versão de cache em `public/sw.js`. A ativação remove caches offline antigos pertencentes a este app.
+
+Validação automatizada: `npm run build` e `npm run test:pwa`. O teste usa Chrome instalado e um servidor local temporário, sem credenciais. Capturas ficam em `artifacts/pwa/`.

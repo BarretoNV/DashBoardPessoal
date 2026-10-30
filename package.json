@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:browser": "node scripts/browser-check.mjs",
+    "test:pwa": "node scripts/pwa-check.mjs",
     "test:task-scroll-browser": "node scripts/task-scroll-browser-check.mjs",
     "test:auth-browser": "node scripts/auth-browser-check.mjs",
     "format": "prettier --write src server scripts *.json *.ts *.js index.html README.md",

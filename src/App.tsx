@@ -42,7 +42,7 @@ export default function App() {
     habits.setValue((old) => toggleHabitDay(old, id, day, now, settings.timezone))
   const registerInteraction = useCallback(() => {
     registerActivity()
-    if (settings.ambient) setSettings((old) => old.ambient ? { ...old, ambient: false } : old)
+    if (settings.ambient) setSettings((old) => (old.ambient ? { ...old, ambient: false } : old))
   }, [registerActivity, setSettings, settings.ambient])
   const toggleAmbient = () => {
     registerActivity()
@@ -90,7 +90,11 @@ export default function App() {
                     setFullscreen(Boolean(document.fullscreenElement))
                     setFullscreenError('')
                   } catch {
-                    setFullscreenError('Use F11 para abrir em tela cheia.')
+                    setFullscreenError(
+                      /Android/i.test(navigator.userAgent)
+                        ? 'Para abrir em tela cheia, instale pelo menu do Chrome e abra pelo ícone do app.'
+                        : 'Use F11 para abrir em tela cheia.',
+                    )
                   }
                 }}
               >

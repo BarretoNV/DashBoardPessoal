@@ -2037,3 +2037,48 @@ ul {
   display: grid;
   gap: 0.5rem;
 }
+/* Keep content clear of cutouts and gesture areas in browser and installed modes. */
+.app-shell {
+  padding-top: max(clamp(16px, 2.3vh, 28px), env(safe-area-inset-top));
+  padding-right: max(clamp(20px, 2.8vw, 54px), env(safe-area-inset-right));
+  padding-bottom: max(clamp(16px, 2.3vh, 28px), env(safe-area-inset-bottom));
+  padding-left: max(clamp(20px, 2.8vw, 54px), env(safe-area-inset-left));
+}
+.access-panel {
+  min-height: 100dvh;
+  padding: max(2rem, env(safe-area-inset-top)) max(2rem, env(safe-area-inset-right))
+    max(2rem, env(safe-area-inset-bottom)) max(2rem, env(safe-area-inset-left));
+}
+.settings-dialog {
+  max-height: calc(
+    100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom))
+  );
+  max-width: calc(
+    100vw - max(16px, env(safe-area-inset-left)) - max(16px, env(safe-area-inset-right))
+  );
+}
+.sync-bar {
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  right: max(0.5rem, env(safe-area-inset-right));
+  max-width: calc(
+    100vw - max(0.5rem, env(safe-area-inset-left)) - max(0.5rem, env(safe-area-inset-right))
+  );
+}
+@media (max-width: 899px), (max-height: 699px) {
+  .app-shell {
+    padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+      max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  }
+}
+@media (display-mode: fullscreen) {
+  .fullscreen-button {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .app-shell {
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+}
