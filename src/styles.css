@@ -156,6 +156,22 @@ ul {
   align-items: center;
   flex-shrink: 0;
 }
+.battery-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: 6px;
+  color: #bbc5ce;
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.battery-indicator.is-charging {
+  color: #a7dcb5;
+}
+.battery-indicator.is-low {
+  color: #ffb46b;
+}
 .icon-button {
   width: 34px;
   height: 34px;
@@ -1799,6 +1815,14 @@ ul {
   }
   .brand > svg {
     width: 20px;
+  }
+  .brand > span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .battery-indicator {
+    gap: 3px;
+    margin-right: 3px;
   }
   .toolbar {
     gap: 2px;

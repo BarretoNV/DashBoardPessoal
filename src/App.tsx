@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { Crosshair, Eye, EyeOff, Maximize, Minimize, Settings2 } from 'lucide-react'
 import { toggleHabitDay } from './services/habitService'
 import { Clock } from './components/Clock'
+import { BatteryIndicator } from './components/BatteryIndicator'
 import { Weather } from './components/Weather'
 import { TodayAgenda } from './components/TodayAgenda'
 import { NextEvent } from './components/NextEvent'
@@ -65,6 +66,7 @@ export default function App() {
           </span>
         </div>
         <div className="toolbar">
+          <BatteryIndicator />
           <button
             className={`ambient-button ${ambient ? 'active' : ''}`}
             aria-pressed={ambient}
