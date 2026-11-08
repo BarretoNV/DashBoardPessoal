@@ -49,7 +49,10 @@ export function PanelAccess({ children }: { children: ReactNode }) {
   return (
     <>
       {state.mode === 'cloud' && (
-        <aside className="sync-bar" aria-label="Sincronização">
+        <aside
+          className={`sync-bar ${state.status === 'error' ? 'sync-error' : ''}`}
+          aria-label="Sincronização"
+        >
           <span role="status">
             {state.status === 'saving'
               ? 'Salvando…'

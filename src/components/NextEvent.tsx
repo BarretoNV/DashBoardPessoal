@@ -27,9 +27,6 @@ export function NextEvent({
   const calendarUrl = event?.url ?? (source === 'google' ? GOOGLE_CALENDAR_URL : undefined)
   return (
     <section className={`next-event ${event ? 'has-event' : ''}`} aria-label="Próximo compromisso">
-      <span className="edge-scan" aria-hidden="true">
-        <span />
-      </span>
       <div className="next-heading">
         <span className="eyebrow">{current ? 'Agora' : 'A seguir'}</span>
         {calendarUrl ? (

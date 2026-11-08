@@ -172,7 +172,6 @@ function Preferences() {
             { key: 'showWeather', label: 'Mostrar clima' },
             { key: 'showTasks', label: 'Mostrar tarefas' },
             { key: 'showHabits', label: 'Mostrar hábitos' },
-            { key: 'animatedBackground', label: 'Fundo animado' },
             { key: 'autoAmbient', label: 'Modo ambiente após 2 min' },
             { key: 'autoRotateTaskLists', label: 'Alternar listas automaticamente' },
             { key: 'hideCompletedTaskLists', label: 'Ocultar listas totalmente concluídas' },
@@ -184,13 +183,11 @@ function Preferences() {
             <input
               type="checkbox"
               checked={
-                item.key === 'animatedBackground'
-                  ? settings.animatedBackground !== false
-                  : item.key === 'autoAmbient' ||
-                      item.key === 'autoRotateTaskLists' ||
-                      item.key === 'autoScrollTasks'
-                    ? settings[item.key] !== false
-                    : settings[item.key] === true
+                item.key === 'autoAmbient' ||
+                item.key === 'autoRotateTaskLists' ||
+                item.key === 'autoScrollTasks'
+                  ? settings[item.key] !== false
+                  : settings[item.key] === true
               }
               onChange={(event) => update(item.key, event.target.checked)}
             />

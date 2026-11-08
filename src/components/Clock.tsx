@@ -3,12 +3,14 @@ import { dateLabel, timeLabel } from '../services/dateService'
 export function Clock({ now }: { now: Date }) {
   const { value: settings } = useDashboardSettings()
   const timezone = settings.timezone ?? 'America/Sao_Paulo'
-  const hour = Number(now.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', hour12: false }))
+  const hour = Number(
+    now.toLocaleTimeString('en-US', { timeZone: timezone, hour: '2-digit', hour12: false }),
+  )
   const greeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   return (
     <div className="clock-block">
+      <span className="day-label">Meu dia</span>
       <p className="eyebrow greeting">
-        <span className="status-dot" />
         {greeting}
         {settings.name ? `, ${settings.name}` : ''}
       </p>

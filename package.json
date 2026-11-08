@@ -19,7 +19,8 @@
     "test:auth-browser": "node scripts/auth-browser-check.mjs",
     "format": "prettier --write src server scripts *.json *.ts *.js index.html README.md",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
-    "test:cloud-browser": "node scripts/cloud-browser-check.mjs"
+    "test:cloud-browser": "node scripts/cloud-browser-check.mjs",
+    "test:tablet-browser": "node scripts/tablet-browser-check.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

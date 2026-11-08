@@ -5,7 +5,7 @@ export const dashboardConfig: DashboardSettings = {
   showWeather: true,
   showTasks: true,
   showHabits: true,
-  accent: '#E6B84A',
+  accent: '#A8C7FA',
   ambient: false,
   autoAmbient: true,
   autoRotateTaskLists: true,

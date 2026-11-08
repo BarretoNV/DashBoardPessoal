@@ -39,14 +39,16 @@ export function WeeklyTracker({
     <section
       className="weekly panel"
       aria-label="Hábitos da semana"
-      onMouseEnter={() => pagination.setHovered(true)}
-      onMouseLeave={() => pagination.setHovered(false)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') pagination.setHovered(true)
+      }}
+      onPointerLeave={() => pagination.setHovered(false)}
       onFocusCapture={() => pagination.setFocused(true)}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) pagination.setFocused(false)
       }}
     >
-      <SectionHeader number="03" title="Constância">
+      <SectionHeader number="03" title="Hábitos">
         <div className="heading-actions">
           <span className="week-range">{range}</span>
           {pagination.pageCount > 1 && (
@@ -91,7 +93,10 @@ export function WeeklyTracker({
           <div className="tracker-row tracker-head">
             <span className="muted">Esta semana</span>
             {days.map((day) => (
-              <span key={dateKey(day, timezone)} className={dateKey(day, timezone) === today ? 'today-label' : ''}>
+              <span
+                key={dateKey(day, timezone)}
+                className={dateKey(day, timezone) === today ? 'today-label' : ''}
+              >
                 {dateLabel(day, { weekday: 'short' }, timezone).replace('.', '')}
                 <small>{dateLabel(day, { day: 'numeric' }, timezone)}</small>
               </span>
@@ -99,7 +104,9 @@ export function WeeklyTracker({
             <span className="goal-heading">Meta semanal</span>
           </div>
           {visible.map((habit) => {
-            const count = days.filter((day) => habit.completedDays.includes(dateKey(day, timezone))).length
+            const count = days.filter((day) =>
+              habit.completedDays.includes(dateKey(day, timezone)),
+            ).length
             return (
               <div className="tracker-row" key={habit.id}>
                 <span className="habit-name">

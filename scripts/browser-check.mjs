@@ -14,6 +14,10 @@ page.on('console', (message) => {
 await page.goto('http://127.0.0.1:5173')
 await page.getByRole('checkbox', { name: 'Estudar', exact: true }).waitFor()
 for (const [name, width, height] of [
+  ['tablet-minimum', 960, 540],
+  ['tablet-browser', 1024, 600],
+  ['tablet-landscape', 1138, 712],
+  ['tablet-installed', 1280, 800],
   ['minimum', 900, 700],
   ['split', 1248, 900],
   ['user-window', 1488, 910],
@@ -29,7 +33,7 @@ for (const [name, width, height] of [
     height: document.documentElement.scrollHeight,
   }))
   assert.ok(dimensions.width <= width, `${name}: horizontal overflow ${dimensions.width}`)
-  if (width >= 900 && height >= 700)
+  if (width >= 900 && height >= 540 && width > height)
     assert.ok(dimensions.height <= height, `${name}: vertical overflow ${dimensions.height}`)
   console.log(`${name}: ${width} × ${height}, content ${dimensions.width} × ${dimensions.height}`)
 }
@@ -117,8 +121,8 @@ await page.getByRole('button', { name: 'Abrir configurações', exact: true }).c
 await page.getByLabel('Mostrar hábitos').uncheck()
 await page.getByLabel('Mostrar tarefas').uncheck()
 await page.keyboard.press('Escape')
-assert.equal(await page.getByRole('heading', { name: /Constância/i }).count(), 0)
-assert.equal(await page.getByRole('heading', { name: /Essencial/i }).count(), 0)
+assert.equal(await page.getByRole('heading', { name: /Hábitos/i }).count(), 0)
+assert.equal(await page.getByRole('heading', { name: /Tarefas/i }).count(), 0)
 await page.getByRole('button', { name: 'Ocultar controles', exact: true }).click()
 assert.equal(
   await page.getByRole('button', { name: 'Abrir configurações', exact: true }).count(),
@@ -160,6 +164,11 @@ await page.getByRole('button', { name: 'Salvar localização', exact: true }).cl
 await page.keyboard.press('Escape')
 await page.getByText('Parcialmente nublado', { exact: true }).waitFor()
 await page.screenshot({ path: 'artifacts/configured.png', fullPage: true })
+await page.getByRole('button', { name: 'Ver previsão detalhada' }).click()
+await page.getByRole('dialog', { name: 'O tempo em São Paulo' }).waitFor()
+assert.equal(await page.locator('.forecast-day').count(), 6)
+await page.getByRole('link', { name: 'Abrir previsão de São Paulo no Windy' }).waitFor()
+await page.keyboard.press('Escape')
 // Long text should wrap without horizontal overflow, including at mobile width.
 await page.getByRole('button', { name: 'Editar tarefas', exact: true }).click()
 await page
@@ -194,17 +203,10 @@ const reducedContext = await browser.newContext({
 })
 const reducedPage = await reducedContext.newPage()
 await reducedPage.goto('http://127.0.0.1:5173')
+assert.equal(await reducedPage.locator('.edge-scan, .greeting .status-dot, video').count(), 0)
 assert.equal(
-  await reducedPage
-    .locator('.greeting .status-dot')
-    .evaluate((element) => getComputedStyle(element).animationName),
-  'none',
-)
-assert.equal(
-  await reducedPage
-    .locator('.tasks .edge-scan > span')
-    .evaluate((element) => getComputedStyle(element).animationName),
-  'none',
+  await reducedPage.locator('.task-list').evaluate((el) => getComputedStyle(el).transitionDuration),
+  '0s',
 )
 await reducedContext.close()
 console.log(

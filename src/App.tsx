@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type CSSProperties } from 'react'
-import { Crosshair, Eye, EyeOff, Maximize, Minimize, Settings2 } from 'lucide-react'
+import { Eye, EyeOff, Maximize, Minimize, Settings2 } from 'lucide-react'
 import { toggleHabitDay } from './services/habitService'
 import { Clock } from './components/Clock'
 import { BatteryIndicator } from './components/BatteryIndicator'
@@ -9,7 +9,6 @@ import { NextEvent } from './components/NextEvent'
 import { TaskList } from './components/TaskList'
 import { WeeklyTracker } from './components/WeeklyTracker'
 import { Settings, type SettingsTab } from './components/Settings'
-import { BackgroundMedia } from './components/BackgroundMedia'
 import { DashboardLayout } from './layouts/DashboardLayout'
 import { useClock } from './hooks/useClock'
 import { useCalendar } from './hooks/useCalendar'
@@ -53,18 +52,18 @@ export default function App() {
     <div
       className={`app-shell ${ambient ? 'ambient' : ''}`}
       style={{ '--accent': settings.accent } as CSSProperties}
-      onPointerDownCapture={registerInteraction}
-      onKeyDownCapture={registerInteraction}
+      onPointerDownCapture={(event) => {
+        if (!(event.target as Element).closest('.ambient-button')) registerInteraction()
+      }}
+      onKeyDownCapture={(event) => {
+        if (!(event.target as Element).closest('.ambient-button')) registerInteraction()
+      }}
     >
-      <BackgroundMedia enabled={settings.animatedBackground !== false} />
       <header className="topbar">
-        <div className="brand">
-          <Crosshair size={24} />
-          <span>
-            CENTRO DE COMANDO<span className="brand-divider">/</span>
-            <span className="brand-secondary">PAINEL PESSOAL</span>
-          </span>
-        </div>
+        <section className="overview" aria-label="Meu dia">
+          <Clock now={now} />
+          <Weather />
+        </section>
         <div className="toolbar">
           <BatteryIndicator />
           <button
@@ -80,47 +79,39 @@ export default function App() {
               {ambient ? 'Mostrar controles' : 'Ocultar controles'}
             </span>
           </button>
-          {!ambient && (
-            <>
-              <button
-                className="icon-button fullscreen-button"
-                aria-label={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
-                onClick={async () => {
-                  try {
-                    if (document.fullscreenElement) await document.exitFullscreen()
-                    else await document.documentElement.requestFullscreen()
-                    setFullscreen(Boolean(document.fullscreenElement))
-                    setFullscreenError('')
-                  } catch {
-                    setFullscreenError(
-                      /Android/i.test(navigator.userAgent)
-                        ? 'Para abrir em tela cheia, instale pelo menu do Chrome e abra pelo ícone do app.'
-                        : 'Use F11 para abrir em tela cheia.',
-                    )
-                  }
-                }}
-              >
-                {fullscreen ? <Minimize size={19} /> : <Maximize size={19} />}
-              </button>
-              <button
-                className="icon-button"
-                aria-label="Abrir configurações"
-                onClick={() => setTab('settings')}
-              >
-                <Settings2 size={20} />
-              </button>
-            </>
-          )}
+          <button
+            className={`icon-button fullscreen-button ${ambient ? 'ambient-hidden' : ''}`}
+            aria-label={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
+            onClick={async () => {
+              try {
+                if (document.fullscreenElement) await document.exitFullscreen()
+                else await document.documentElement.requestFullscreen()
+                setFullscreen(Boolean(document.fullscreenElement))
+                setFullscreenError('')
+              } catch {
+                setFullscreenError(
+                  /Android/i.test(navigator.userAgent)
+                    ? 'Para abrir em tela cheia, instale pelo menu do Chrome e abra pelo ícone do app.'
+                    : 'Use F11 para abrir em tela cheia.',
+                )
+              }
+            }}
+          >
+            {fullscreen ? <Minimize size={19} /> : <Maximize size={19} />}
+          </button>
+          <button
+            className={`icon-button ${ambient ? 'ambient-hidden' : ''}`}
+            aria-label="Abrir configurações"
+            onClick={() => setTab('settings')}
+          >
+            <Settings2 size={20} />
+          </button>
         </div>
       </header>
       <span className="sr-only" id="controls-description">
         Esconde botões de edição e detalhes auxiliares. Tarefas e hábitos continuam interativos.
       </span>
       <DashboardLayout>
-        <section className="overview">
-          <Clock now={now} />
-          <Weather />
-        </section>
         <NextEvent
           event={calendar.next}
           now={now}
@@ -138,6 +129,8 @@ export default function App() {
           error={calendar.error}
           source={calendar.source}
           notice={calendar.notice}
+          settingsOpen={tab !== null}
+          activityRevision={activityRevision}
         />
         {settings.showTasks && (
           <TaskList
@@ -176,17 +169,6 @@ export default function App() {
           />
         )}
       </DashboardLayout>
-      <footer className="footer">
-        <span>
-          <span className="status-dot" />
-          Visão do dia
-        </span>
-        {!ambient && (
-          <span>
-            {now.getFullYear()} <span className="footer-divider">/</span> CENTRO PESSOAL
-          </span>
-        )}
-      </footer>
       {(!saved || !tasks.saved || !habits.saved || !google.saved) && (
         <p className="save-notice" role="status">
           Não foi possível salvar. Suas alterações durarão apenas nesta sessão.

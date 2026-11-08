@@ -1,5 +1,13 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { CalendarDays, Check, ChevronDown, ExternalLink, Plus, SlidersHorizontal, X } from 'lucide-react'
+import {
+  CalendarDays,
+  Check,
+  ChevronDown,
+  ExternalLink,
+  Plus,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react'
 import type { DataSource, GoogleTaskList, Task } from '../types'
 import { taskService } from '../services/taskService'
 import { taskDueLabel } from '../services/dateService'
@@ -85,16 +93,26 @@ export function TaskList({
     const items = tasksByList[list.id]
     return !hideCompletedLists || !items?.length || items.some((task) => !task.completed)
   })
-  const ordered = hideCompletedLists && tasks.length > 0 && pending === 0 ? [] : taskService.ordered(tasks)
+  const ordered =
+    hideCompletedLists && tasks.length > 0 && pending === 0 ? [] : taskService.ordered(tasks)
   const selectedList = lists.find((list) => list.id === selectedListId)
   const eligibleLists = lists.filter((list) =>
     (tasksByList[list.id] ?? []).some((task) => !task.completed),
   )
   const rotationIndex = eligibleLists.findIndex((list) => list.id === selectedListId)
   const interactionPaused =
-    hovered || focusWithin || selectingList || creating || editingTaskId !== null || settingsOpen || !pageVisible || activityCooling
+    hovered ||
+    focusWithin ||
+    selectingList ||
+    creating ||
+    editingTaskId !== null ||
+    settingsOpen ||
+    !pageVisible ||
+    activityCooling
   const rotationPaused = !autoRotate || source !== 'google' || interactionPaused
-  const measureKey = ordered.map((task) => `${task.id}:${task.completed}:${task.due ?? ''}`).join('|')
+  const measureKey = ordered
+    .map((task) => `${task.id}:${task.completed}:${task.due ?? ''}`)
+    .join('|')
   const scroll = useAutoTaskScroll({
     viewportRef: taskViewport,
     resetKey: selectedListId || 'local',
@@ -103,7 +121,11 @@ export function TaskList({
     paused: interactionPaused,
   })
   useEffect(() => {
-    if (hideCompletedLists && !loading && !visibleLists.some((list) => list.id === selectedListId)) {
+    if (
+      hideCompletedLists &&
+      !loading &&
+      !visibleLists.some((list) => list.id === selectedListId)
+    ) {
       const next = visibleLists[0]
       if (next) onSelectList(next.id)
     }
@@ -189,14 +211,25 @@ export function TaskList({
       onRotateList(nextId)
     }, 0)
     return () => window.clearTimeout(timer)
-  }, [lists, minimumDwellReady, onRotateList, rotationPaused, scroll.isAutoScrolling, scroll.lastCompletedKey, selectedListId, tasksByList, unreadListIds])
+  }, [
+    lists,
+    minimumDwellReady,
+    onRotateList,
+    rotationPaused,
+    scroll.isAutoScrolling,
+    scroll.lastCompletedKey,
+    selectedListId,
+    tasksByList,
+    unreadListIds,
+  ])
   useEffect(() => {
     if (
       autoShownId !== selectedListId ||
       !unreadListIds.includes(selectedListId) ||
       settingsOpen ||
       !pageVisible
-    ) return
+    )
+      return
     const timer = window.setTimeout(() => {
       onMarkListSeen(selectedListId)
       setAutoShownId(null)
@@ -239,7 +272,9 @@ export function TaskList({
     <section
       className="tasks panel"
       aria-label="Tarefas"
-      onPointerEnter={() => setHovered(true)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') setHovered(true)
+      }}
       onPointerLeave={() => setHovered(false)}
       onFocusCapture={() => setFocusWithin(true)}
       onBlurCapture={(event) => {
@@ -250,76 +285,108 @@ export function TaskList({
     >
       <SectionHeader
         number="02"
-        title={source === 'google' ? (
-          <span className="task-list-selector" ref={listSelector}>
-            <button
-              className="task-list-trigger"
-              type="button"
-              aria-label={`Lista ${selectedList?.title ?? 'Google Tasks'}`}
-              aria-haspopup="menu"
-              aria-expanded={selectingList}
-              onClick={() => setSelectingList((open) => !open)}
-              onKeyDown={(event) => {
-                if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && visibleLists.length) {
-                  event.preventDefault()
-                  setSelectingList(true)
-                  requestAnimationFrame(() => listButtons.current.get(
-                    event.key === 'ArrowDown' ? visibleLists[0].id : visibleLists[visibleLists.length - 1].id,
-                  )?.focus())
-                }
-              }}
-            >
-              <span>{selectedList?.title ?? 'Google Tasks'}</span>
-              <ChevronDown size={16} aria-hidden="true" />
-            </button>
-            {selectingList ? (
-              <span className="task-list-menu" role="menu" aria-label="Listas do Google Tasks">
-                {visibleLists.map((list) => {
-                  const listPending = (tasksByList[list.id] ?? []).filter((task) => !task.completed).length
-                  const hasNew = unreadListIds.includes(list.id)
-                  return (
-                    <button
-                      key={list.id}
-                      type="button"
-                      role="menuitemradio"
-                      aria-checked={list.id === selectedListId}
-                      ref={(element) => {
-                        if (element) listButtons.current.set(list.id, element)
-                        else listButtons.current.delete(list.id)
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                          event.preventDefault()
-                          moveListFocus(list.id, event.key === 'ArrowDown' ? 1 : -1)
-                        }
-                      }}
-                      onClick={() => {
-                        setAutoShownId(null)
-                        onSelectList(list.id)
-                        setSelectingList(false)
-                      }}
-                    >
-                      <span className={`list-new-dot ${hasNew ? 'visible' : ''}`} aria-label={hasNew ? 'Novas tarefas' : undefined} />
-                      <span className="list-menu-title">{list.title}</span>
-                      <span className="list-menu-count">{listPending}</span>
-                    </button>
-                  )
-                })}
-              </span>
-            ) : null}
-          </span>
-        ) : 'Essencial'}
+        title={
+          source === 'google' ? (
+            <span className="task-list-selector" ref={listSelector}>
+              <button
+                className="task-list-trigger"
+                type="button"
+                aria-label={`Lista ${selectedList?.title ?? 'Google Tasks'}`}
+                aria-haspopup="menu"
+                aria-expanded={selectingList}
+                onClick={() => setSelectingList((open) => !open)}
+                onKeyDown={(event) => {
+                  if (
+                    (event.key === 'ArrowDown' || event.key === 'ArrowUp') &&
+                    visibleLists.length
+                  ) {
+                    event.preventDefault()
+                    setSelectingList(true)
+                    requestAnimationFrame(() =>
+                      listButtons.current
+                        .get(
+                          event.key === 'ArrowDown'
+                            ? visibleLists[0].id
+                            : visibleLists[visibleLists.length - 1].id,
+                        )
+                        ?.focus(),
+                    )
+                  }
+                }}
+              >
+                <span>Tarefas · {selectedList?.title ?? 'Google Tasks'}</span>
+                <ChevronDown size={16} aria-hidden="true" />
+              </button>
+              {selectingList ? (
+                <span className="task-list-menu" role="menu" aria-label="Listas do Google Tasks">
+                  {visibleLists.map((list) => {
+                    const listPending = (tasksByList[list.id] ?? []).filter(
+                      (task) => !task.completed,
+                    ).length
+                    const hasNew = unreadListIds.includes(list.id)
+                    return (
+                      <button
+                        key={list.id}
+                        type="button"
+                        role="menuitemradio"
+                        aria-checked={list.id === selectedListId}
+                        ref={(element) => {
+                          if (element) listButtons.current.set(list.id, element)
+                          else listButtons.current.delete(list.id)
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                            event.preventDefault()
+                            moveListFocus(list.id, event.key === 'ArrowDown' ? 1 : -1)
+                          }
+                        }}
+                        onClick={() => {
+                          setAutoShownId(null)
+                          onSelectList(list.id)
+                          setSelectingList(false)
+                        }}
+                      >
+                        <span
+                          className={`list-new-dot ${hasNew ? 'visible' : ''}`}
+                          aria-label={hasNew ? 'Novas tarefas' : undefined}
+                        />
+                        <span className="list-menu-title">{list.title}</span>
+                        <span className="list-menu-count">{listPending}</span>
+                      </button>
+                    )
+                  })}
+                </span>
+              ) : null}
+            </span>
+          ) : (
+            'Tarefas'
+          )
+        }
       >
         <div className="heading-actions">
           <span
             className={`task-pending-count${loading ? ' syncing' : ''}`}
-            aria-label={loading ? 'Sincronizando tarefas' : `${pending} ${pending === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`}
-            title={loading ? 'Sincronizando tarefas' : `${pending} ${pending === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`}
+            aria-label={
+              loading
+                ? 'Sincronizando tarefas'
+                : `${pending} ${pending === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`
+            }
+            title={
+              loading
+                ? 'Sincronizando tarefas'
+                : `${pending} ${pending === 1 ? 'tarefa pendente' : 'tarefas pendentes'}`
+            }
           >
             {loading ? '…' : pending}
           </span>
           {eligibleLists.length > 1 && rotationIndex >= 0 ? (
-            <span className="task-list-position" title={`Lista ${rotationIndex + 1} de ${eligibleLists.length}`} aria-label={`Lista ${rotationIndex + 1} de ${eligibleLists.length}`}>{rotationIndex + 1}/{eligibleLists.length}</span>
+            <span
+              className="task-list-position"
+              title={`Lista ${rotationIndex + 1} de ${eligibleLists.length}`}
+              aria-label={`Lista ${rotationIndex + 1} de ${eligibleLists.length}`}
+            >
+              {rotationIndex + 1}/{eligibleLists.length}
+            </span>
           ) : null}
           {!ambient && source === 'google' ? (
             <a
@@ -375,11 +442,7 @@ export function TaskList({
         </div>
       ) : null}
       {pending === 0 && <p className="empty task-empty">Nada pendente.</p>}
-      <ul
-        className="task-list task-list-enter"
-        key={selectedListId || 'local'}
-        ref={taskViewport}
-      >
+      <ul className="task-list task-list-enter" key={selectedListId || 'local'} ref={taskViewport}>
         {ordered.map((task) => (
           <li
             key={task.id}
@@ -434,7 +497,8 @@ export function TaskList({
                       title={editDue ? `Data: ${editDue}` : 'Adicionar data'}
                       disabled={editSaving}
                       onClick={() => {
-                        if (typeof datePicker.current?.showPicker === 'function') datePicker.current.showPicker()
+                        if (typeof datePicker.current?.showPicker === 'function')
+                          datePicker.current.showPicker()
                         else datePicker.current?.click()
                       }}
                     >
@@ -469,7 +533,11 @@ export function TaskList({
                       <X size={16} />
                     </button>
                   </span>
-                  {editDue ? <span className="task-edit-date">{taskDueLabel(editDue, now, settings.timezone).text}</span> : null}
+                  {editDue ? (
+                    <span className="task-edit-date">
+                      {taskDueLabel(editDue, now, settings.timezone).text}
+                    </span>
+                  ) : null}
                 </form>
               ) : (
                 <>
@@ -485,10 +553,16 @@ export function TaskList({
                     }}
                   >
                     <DetailText text={task.title} />
-                    {task.due ? (() => {
-                      const due = taskDueLabel(task.due, now, settings.timezone)
-                      return <span className={`task-due ${due.overdue ? 'overdue' : ''}`}>{due.text}</span>
-                    })() : null}
+                    {task.due
+                      ? (() => {
+                          const due = taskDueLabel(task.due, now, settings.timezone)
+                          return (
+                            <span className={`task-due ${due.overdue ? 'overdue' : ''}`}>
+                              {due.text}
+                            </span>
+                          )
+                        })()
+                      : null}
                   </button>
                   {!task.completed && task.priority === 'high' && (
                     <span className="priority-dot" title="Prioridade alta" />
@@ -497,12 +571,18 @@ export function TaskList({
               )}
             </div>
             {editingTaskId === task.id && editError ? (
-              <span className="task-inline-error" role="alert">{editError}</span>
+              <span className="task-inline-error" role="alert">
+                {editError}
+              </span>
             ) : null}
           </li>
         ))}
       </ul>
-      {!ambient && notice && !editError && <p className="data-notice" role="status">{notice}</p>}
+      {!ambient && notice && !editError && (
+        <p className="data-notice" role="status">
+          {notice}
+        </p>
+      )}
     </section>
   )
 }

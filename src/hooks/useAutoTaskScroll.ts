@@ -13,18 +13,21 @@ export function useAutoTaskScroll({
   measureKey,
   enabled,
   paused,
+  itemSelector = '[data-task-pending="true"]',
 }: {
   viewportRef: RefObject<HTMLElement | null>
   resetKey: string
   measureKey: string
   enabled: boolean
   paused: boolean
+  itemSelector?: string
 }) {
   const [hasOverflow, setHasOverflow] = useState(false)
   const [lastCompletedKey, setLastCompletedKey] = useState<string | null>(null)
-  const [reducedMotion, setReducedMotion] = useState(() =>
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  const [reducedMotion, setReducedMotion] = useState(
+    () =>
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   )
   const scrollLimit = useRef(0)
   const phase = useRef<Phase>('top')
@@ -45,15 +48,20 @@ export function useAutoTaskScroll({
     const viewport = viewportRef.current
     if (!viewport) return
     const measure = () => {
-      const pendingItems = viewport.querySelectorAll<HTMLElement>('[data-task-pending="true"]')
+      const pendingItems = viewport.querySelectorAll<HTMLElement>(itemSelector)
       const lastPending = pendingItems.item(pendingItems.length - 1)
       const pendingBottom = lastPending
-        ? lastPending.getBoundingClientRect().bottom - viewport.getBoundingClientRect().top + viewport.scrollTop
+        ? lastPending.getBoundingClientRect().bottom -
+          viewport.getBoundingClientRect().top +
+          viewport.scrollTop
         : 0
-      scrollLimit.current = Math.max(0, Math.min(
-        viewport.scrollHeight - viewport.clientHeight,
-        pendingBottom - viewport.clientHeight,
-      ))
+      scrollLimit.current = Math.max(
+        0,
+        Math.min(
+          viewport.scrollHeight - viewport.clientHeight,
+          pendingBottom - viewport.clientHeight,
+        ),
+      )
       setHasOverflow(scrollLimit.current > 1)
       if (viewport.scrollTop > scrollLimit.current) {
         viewport.scrollTop = scrollLimit.current
@@ -66,12 +74,12 @@ export function useAutoTaskScroll({
     const frame = requestAnimationFrame(measure)
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
     observer?.observe(viewport)
-    viewport.querySelectorAll('[data-task-pending="true"]').forEach((item) => observer?.observe(item))
+    viewport.querySelectorAll(itemSelector).forEach((item) => observer?.observe(item))
     return () => {
       cancelAnimationFrame(frame)
       observer?.disconnect()
     }
-  }, [measureKey, viewportRef])
+  }, [measureKey, viewportRef, itemSelector])
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return
@@ -98,7 +106,7 @@ export function useAutoTaskScroll({
         const bottom = scrollLimit.current
         scrollPosition.current = Math.min(
           bottom,
-          scrollPosition.current + SPEED_PX_PER_SECOND * delta / 1000,
+          scrollPosition.current + (SPEED_PX_PER_SECOND * delta) / 1000,
         )
         viewport.scrollTop = scrollPosition.current
         if (scrollPosition.current >= bottom - 0.5) {

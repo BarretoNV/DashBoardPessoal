@@ -1,6 +1,6 @@
-# Centro de Comando — Painel Pessoal
+# Meu dia — Painel pessoal
 
-Dashboard noturna para permanecer aberta em uma TV. O projeto usa React, TypeScript, Vite, Tailwind CSS e uma API Node.js/Express local. O clima vem do Open-Meteo; Google Calendar e Google Tasks são integrações opcionais.
+Dashboard escura e suave para permanecer aberta em um tablet em paisagem, com foco no Galaxy Tab S6 Lite. O projeto usa React, TypeScript, Vite, Tailwind CSS e uma API Node.js/Express local. O clima vem do Open-Meteo; Google Calendar e Google Tasks são integrações opcionais.
 
 Sem uma conexão Google, a agenda de demonstração e as tarefas locais continuam funcionando. A interface identifica quando está mostrando **Google Calendar**, **Google Tasks** ou **Dados locais**.
 
@@ -18,7 +18,7 @@ Esse comando inicia os dois processos:
 - dashboard React/Vite em `http://127.0.0.1:5173`;
 - API local em `http://127.0.0.1:8787`.
 
-A dashboard cabe sem rolagem a partir de 900 × 700 px. Em telas menores, ela empilha as seções e permite rolagem.
+A dashboard cabe sem rolagem da página em paisagem a partir de 960 × 540 CSS px (também mantém o layout em 900 × 540). O fundo é liso, com cards foscos e controles de pelo menos 44 px. Agenda e tarefas têm rolagem interna automática quando necessário; hábitos usam paginação. Em retrato e telas menores, as seções são empilhadas. Configurações e formulários podem rolar, inclusive com o teclado aberto.
 
 ## Uso e dados locais
 
@@ -26,11 +26,13 @@ A dashboard cabe sem rolagem a partir de 900 × 700 px. Em telas menores, ela em
 - O ícone de olho ativa **Ocultar controles**. Ele esconde controles administrativos e mantém tarefas e hábitos interativos.
 - O título de **Essencial** permite alternar entre listas do Google Tasks; o botão `+` cria uma tarefa com título e data opcional na lista selecionada.
 - Listas com pendências alternam automaticamente a cada 30 segundos sem interação, e o modo ambiente entra após 2 minutos. Clique, toque ou teclado revelam os controles novamente.
-- Os sinais e bordas usam movimento discreto. A preferência `prefers-reduced-motion` do sistema desativa as animações não essenciais.
-- O clima usa Open-Meteo e não requer chave.
+- Não há efeitos neon, mídia de fundo ou animações decorativas. A preferência `prefers-reduced-motion` desativa a rolagem automática; o conteúdo continua acessível por toque ou teclado. A cor personalizada salva é preservada; novas instalações usam azul suave.
+- O clima usa Open-Meteo e não requer chave. O botão de detalhes abre a previsão dos próximos dias e o acesso ao Windy.
 - O fuso padrão é `America/Sao_Paulo` e pode ser alterado.
 - Tarefas locais, hábitos, localização e preferências ficam no `localStorage`.
 - A agenda local demonstrativa fica em `src/data/demo.ts`.
+
+Para validar o layout e os alvos de toque em cenários de tablet, com o servidor local ativo, execute `npm run test:tablet-browser`. As imagens ficam em `artifacts/tablet`.
 
 ## Google Calendar e Google Tasks
 

@@ -93,27 +93,44 @@ export function Weather() {
               </span>
               {stale ? <span role="status">Leitura desatualizada</span> : null}
             </div>
-            <a
+            <button
               className="weather-external"
-              href={windyUrl}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`Abrir previsão de ${locationName} no Windy`}
-              title="Abrir previsão detalhada no Windy"
+              type="button"
+              popoverTarget="weather-forecast"
+              aria-label="Ver previsão detalhada"
+              aria-haspopup="dialog"
             >
               <ExternalLink size={16} aria-hidden="true" />
-            </a>
+            </button>
           </>
         ) : (
           <p role="status">{loading ? 'Consultando o clima…' : 'Clima indisponível.'}</p>
         )}
       </div>
       {data ? (
-        <ol className="forecast-strip" aria-label="Previsão para os próximos seis dias">
-          {data.days.slice(1).map((day) => (
-            <ForecastDay key={day.date} day={day} timezone={settings.timezone} />
-          ))}
-        </ol>
+        <div
+          id="weather-forecast"
+          className="forecast-popover"
+          popover="auto"
+          role="dialog"
+          aria-labelledby="forecast-title"
+        >
+          <h2 id="forecast-title">O tempo em {locationName}</h2>
+          <ol className="forecast-strip" aria-label="Previsão para os próximos seis dias">
+            {data.days.slice(1).map((day) => (
+              <ForecastDay key={day.date} day={day} timezone={settings.timezone} />
+            ))}
+          </ol>
+          <a
+            className="secondary-button"
+            href={windyUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Abrir previsão de ${locationName} no Windy`}
+          >
+            Abrir no Windy
+          </a>
+        </div>
       ) : null}
     </section>
   )

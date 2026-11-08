@@ -71,6 +71,9 @@ try {
   await page.getByRole('button', { name: 'Abrir configurações' }).waitFor()
   await mkdir('artifacts/pwa', { recursive: true })
   for (const [width, height] of [
+    [960, 540],
+    [1138, 712],
+    [1280, 800],
     [360, 800],
     [412, 915],
     [800, 360],

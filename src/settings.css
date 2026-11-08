@@ -1,10 +1,14 @@
 .settings-dialog {
-  color: #edf0f2;
-  background: #111418;
-  border: 1px solid #343b44;
-  border-radius: 16px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
   width: min(680px, calc(100vw - 32px));
-  max-height: 90dvh;
+  max-height: calc(
+    100dvh - max(16px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom))
+  );
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 0;
   margin: auto;
 }
@@ -34,14 +38,14 @@
   display: flex;
   gap: 6px;
   margin: 26px 0;
-  border-bottom: 1px solid #30363c;
+  border-bottom: 1px solid var(--border);
 }
 .settings-tabs button {
   border: 0;
   border-bottom: 2px solid transparent;
   background: transparent;
   padding: 12px 15px;
-  color: #aab4be;
+  color: var(--text-secondary);
   font-size: 16px;
 }
 .settings-tabs button[aria-current] {
@@ -54,41 +58,41 @@
 }
 label {
   font-size: 16px;
-  color: #cbd2da;
+  color: var(--text-secondary);
   display: block;
 }
 input:not([type='checkbox']):not([type='color']),
 select {
   display: block;
   width: 100%;
-  border: 1px solid #3a424b;
-  border-radius: 7px;
-  background: #0c0f12;
-  color: #eef1f4;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
+  background: var(--surface-raised);
+  color: var(--text);
   padding: 11px 12px;
   min-width: 0;
   margin-top: 8px;
   font-size: 16px;
 }
 input::placeholder {
-  color: #8e99a6;
+  color: var(--text-secondary);
 }
 input[type='checkbox'] {
   accent-color: var(--accent);
-  width: 20px;
-  height: 20px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
 }
 fieldset {
-  border: 1px solid #303943;
-  border-radius: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
   padding: 18px;
   margin: 0;
 }
 legend {
   font-size: 16px;
   padding: 0 7px;
-  color: #d3d9df;
+  color: var(--text);
 }
 .toggle-row {
   display: flex;
@@ -104,10 +108,10 @@ legend {
 }
 .color-field input {
   width: 46px;
-  height: 34px;
-  background: #0c0f12;
-  border: 1px solid #3a424b;
-  border-radius: 5px;
+  height: 44px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-field);
 }
 .coordinate-fields {
   display: grid;
@@ -122,14 +126,14 @@ legend {
   gap: 8px;
   background: var(--accent-readable);
   border: 0;
-  border-radius: 7px;
-  color: #111418;
+  border-radius: var(--radius-field);
+  color: var(--background);
   font-size: 16px;
   font-weight: 500;
   padding: 11px 16px;
 }
 .primary-button:hover {
-  background: #f4e4bc;
+  background: color-mix(in srgb, var(--accent-readable) 85%, white);
 }
 .integrations-panel {
   display: grid;
@@ -141,7 +145,7 @@ legend {
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid #303943;
+  border-bottom: 1px solid var(--border);
 }
 .integration-row > div {
   display: grid;
@@ -152,7 +156,7 @@ legend {
   font-weight: 500;
 }
 .integration-row span:not(.connection-status) {
-  color: #aeb9c4;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 .connection-status {
@@ -170,9 +174,9 @@ legend {
   justify-content: center;
   gap: 7px;
   padding: 8px 10px;
-  border: 1px solid #56626d;
-  background: #151c23;
-  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-field);
   font-size: 14px;
 }
 .disconnect-button {
@@ -183,13 +187,13 @@ legend {
 .integration-message {
   padding: 9px 11px;
   border-left: 2px solid var(--accent);
-  background: #171a1e;
+  background: var(--surface);
   color: #d7c89f;
   font-size: 14px;
   line-height: 1.45;
 }
 .remote-task-title {
-  color: #e5e9ed;
+  color: var(--text);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -197,7 +201,7 @@ legend {
 }
 .field-hint {
   font-size: 14px;
-  color: #a3afbb;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0 0 16px;
 }
@@ -206,8 +210,8 @@ legend {
 }
 .local-note {
   font-size: 12px;
-  color: #9aa6b3;
-  border-top: 1px solid #2c333a;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
   margin-top: 24px;
   padding-top: 16px;
 }
@@ -218,17 +222,15 @@ legend {
   gap: 10px;
   margin: 0 0 22px;
   padding: 14px;
-  border: 1px solid #3a4651;
-  background: #0a1015;
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 .task-create-heading {
   display: none;
 }
 .task-create-form label {
   font-size: 13px;
-  font-family: var(--mono);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-family: inherit;
 }
 .task-create-form input:not([type='checkbox']) {
   margin-top: 6px;
@@ -249,7 +251,7 @@ legend {
 }
 .task-editor-row {
   display: grid;
-  grid-template-columns: 20px 1fr 88px 36px;
+  grid-template-columns: 44px minmax(0, 1fr) 88px 44px;
   align-items: center;
   gap: 10px;
 }
@@ -274,7 +276,7 @@ legend {
 }
 .habit-editor-fields {
   display: grid;
-  grid-template-columns: 1fr 100px 36px;
+  grid-template-columns: minmax(0, 1fr) 100px 44px;
   align-items: end;
   gap: 12px;
 }
@@ -290,9 +292,9 @@ legend {
   flex-direction: column;
   gap: 8px;
   padding: 10px 3px;
-  border: 1px solid #343e48;
-  background: #171c21;
-  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius-field);
   font-size: 14px;
 }
 .habit-editor-days button > span:last-child {
@@ -306,4 +308,30 @@ legend {
 }
 .habit-editor-days button:disabled {
   opacity: 0.35;
+}
+
+.settings-dialog button,
+.settings-dialog select,
+.settings-dialog input:not([type='checkbox']) {
+  min-height: 44px;
+}
+.settings-tabs button {
+  border-radius: var(--radius-control) var(--radius-control) 0 0;
+}
+.settings-tabs button[aria-current] {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.settings-dialog .text-tooltip {
+  display: none;
+}
+@media (max-width: 600px) {
+  .dialog-content {
+    padding: 20px;
+  }
+  .task-editor-row {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+  }
+  .task-editor-row select {
+    grid-column: 2;
+  }
 }
