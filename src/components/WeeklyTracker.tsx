@@ -103,51 +103,53 @@ export function WeeklyTracker({
             ))}
             <span className="goal-heading">Meta semanal</span>
           </div>
-          {visible.map((habit) => {
-            const count = days.filter((day) =>
-              habit.completedDays.includes(dateKey(day, timezone)),
-            ).length
-            return (
-              <div className="tracker-row" key={habit.id}>
-                <span className="habit-name">
-                  <DetailText text={habit.name} focusable />
-                </span>
-                {days.map((day) => {
-                  const key = dateKey(day, timezone)
-                  const done = habit.completedDays.includes(key)
-                  return (
-                    <button
-                      type="button"
-                      className={'day-cell ' + (key === today ? 'today' : '')}
-                      key={key}
-                      aria-label={habit.name + ', ' + dateLabel(day, {}, timezone)}
-                      aria-pressed={done}
-                      disabled={key > today}
-                      onClick={() => onToggleDay(habit.id, key)}
-                    >
-                      <span
-                        className={
-                          'habit-dot ' + (done ? 'done ' : '') + (key > today ? 'future' : '')
-                        }
-                      >
-                        {done && <Check size={15} />}
-                      </span>
-                    </button>
-                  )
-                })}
-                <div className="habit-progress">
-                  <span>
-                    <strong>{count}</strong> / {habit.target}
+          <div className="habit-page" key={pagination.page}>
+            {visible.map((habit) => {
+              const count = days.filter((day) =>
+                habit.completedDays.includes(dateKey(day, timezone)),
+              ).length
+              return (
+                <div className="tracker-row" key={habit.id}>
+                  <span className="habit-name">
+                    <DetailText text={habit.name} focusable />
                   </span>
-                  <ProgressBar
-                    value={count}
-                    target={habit.target}
-                    label={'Meta de ' + habit.name}
-                  />
+                  {days.map((day) => {
+                    const key = dateKey(day, timezone)
+                    const done = habit.completedDays.includes(key)
+                    return (
+                      <button
+                        type="button"
+                        className={'day-cell ' + (key === today ? 'today' : '')}
+                        key={key}
+                        aria-label={habit.name + ', ' + dateLabel(day, {}, timezone)}
+                        aria-pressed={done}
+                        disabled={key > today}
+                        onClick={() => onToggleDay(habit.id, key)}
+                      >
+                        <span
+                          className={
+                            'habit-dot ' + (done ? 'done ' : '') + (key > today ? 'future' : '')
+                          }
+                        >
+                          {done && <Check size={15} />}
+                        </span>
+                      </button>
+                    )
+                  })}
+                  <div className="habit-progress">
+                    <span>
+                      <strong>{count}</strong> / {habit.target}
+                    </span>
+                    <ProgressBar
+                      value={count}
+                      target={habit.target}
+                      label={'Meta de ' + habit.name}
+                    />
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
     </section>

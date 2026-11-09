@@ -26,13 +26,13 @@ A dashboard cabe sem rolagem da página em paisagem a partir de 960 × 540 CSS p
 - O ícone de olho ativa **Ocultar controles**. Ele esconde controles administrativos e mantém tarefas e hábitos interativos.
 - O título de **Essencial** permite alternar entre listas do Google Tasks; o botão `+` cria uma tarefa com título e data opcional na lista selecionada.
 - Listas com pendências alternam automaticamente a cada 30 segundos sem interação, e o modo ambiente entra após 2 minutos. Clique, toque ou teclado revelam os controles novamente.
-- Não há efeitos neon, mídia de fundo ou animações decorativas. A preferência `prefers-reduced-motion` desativa a rolagem automática; o conteúdo continua acessível por toque ou teclado. A cor personalizada salva é preservada; novas instalações usam azul suave.
+- Não há efeitos neon nem mídia de fundo. As interações usam animações curtas: resposta ao toque, confirmação de tarefas e hábitos, reorganização de tarefas e abertura e fechamento de painéis. A preferência `prefers-reduced-motion` desativa a rolagem automática; o conteúdo continua acessível por toque ou teclado. A cor personalizada salva é preservada; novas instalações usam azul suave.
 - O clima usa Open-Meteo e não requer chave. O botão de detalhes abre a previsão dos próximos dias e o acesso ao Windy.
 - O fuso padrão é `America/Sao_Paulo` e pode ser alterado.
 - Tarefas locais, hábitos, localização e preferências ficam no `localStorage`.
 - A agenda local demonstrativa fica em `src/data/demo.ts`.
 
-Para validar o layout e os alvos de toque em cenários de tablet, com o servidor local ativo, execute `npm run test:tablet-browser`. As imagens ficam em `artifacts/tablet`.
+Para validar o layout e os alvos de toque em cenários de tablet, com o servidor local ativo, execute `npm run test:tablet-browser`. As imagens ficam em `artifacts/tablet`. Para testar as animações de interação, execute `npm run test:motion-browser`; o teste grava uma demonstração em `artifacts/motion/demo.webm` e verifica também foco e movimento reduzido.
 
 ## Google Calendar e Google Tasks
 

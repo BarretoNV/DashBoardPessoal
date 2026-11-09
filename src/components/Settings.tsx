@@ -42,6 +42,18 @@ export function Settings({
 }: Props) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [tab, setTab] = useState(initialTab)
+  const [closing, setClosing] = useState(false)
+  const requestClose = () => {
+    if (closing) return
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) close()
+    else setClosing(true)
+  }
+  useEffect(() => {
+    if (!closing) return
+    // Fallback for background tabs or platforms that do not dispatch animationend.
+    const timer = window.setTimeout(close, 220)
+    return () => window.clearTimeout(timer)
+  }, [closing, close])
   useEffect(() => {
     const element = dialog.current
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -57,9 +69,15 @@ export function Settings({
   return (
     <dialog
       ref={dialog}
-      className="settings-dialog"
+      className={`settings-dialog ${closing ? 'is-closing' : ''}`}
       aria-labelledby="settings-title"
-      onCancel={close}
+      onCancel={(event) => {
+        event.preventDefault()
+        requestClose()
+      }}
+      onAnimationEnd={(event) => {
+        if (closing && event.target === event.currentTarget) close()
+      }}
       onClick={(event) => {
         if (event.target === dialog.current) {
           const rect = dialog.current.getBoundingClientRect()
@@ -69,7 +87,7 @@ export function Settings({
             event.clientY < rect.top ||
             event.clientY > rect.bottom
           )
-            close()
+            requestClose()
         }
       }}
     >
@@ -79,7 +97,7 @@ export function Settings({
             <p className="eyebrow">Do seu jeito</p>
             <h2 id="settings-title">Seu centro pessoal</h2>
           </div>
-          <button className="icon-button" onClick={close} aria-label="Fechar configurações">
+          <button className="icon-button" onClick={requestClose} aria-label="Fechar configurações">
             <X />
           </button>
         </header>
@@ -94,24 +112,31 @@ export function Settings({
             </button>
           ))}
         </nav>
-        {tab === 'settings' ? (
-          <>
-            <Preferences />
-            <BackupControls />
-          </>
-        ) : tab === 'tasks' ? (
-          <TaskEditor
-            tasks={tasks}
-            setTasks={setTasks}
-            onComplete={onComplete}
-            onCreate={onCreate}
-            taskSource={taskSource}
-            taskNotice={taskNotice}
-            tasksLoading={tasksLoading}
-          />
-        ) : (
-          <HabitEditor habits={habits} setHabits={setHabits} now={now} onToggleDay={onToggleDay} />
-        )}
+        <div className="settings-tab-content" key={tab}>
+          {tab === 'settings' ? (
+            <>
+              <Preferences />
+              <BackupControls />
+            </>
+          ) : tab === 'tasks' ? (
+            <TaskEditor
+              tasks={tasks}
+              setTasks={setTasks}
+              onComplete={onComplete}
+              onCreate={onCreate}
+              taskSource={taskSource}
+              taskNotice={taskNotice}
+              tasksLoading={tasksLoading}
+            />
+          ) : (
+            <HabitEditor
+              habits={habits}
+              setHabits={setHabits}
+              now={now}
+              onToggleDay={onToggleDay}
+            />
+          )}
+        </div>
         <p className="local-note" role="status">
           {saved
             ? getCloudSnapshot().mode === 'cloud'

@@ -99,6 +99,9 @@ try {
     .waitFor()
   // Layout checks include child bounds, so hiding body overflow cannot produce a false pass.
   async function checkLayout() {
+    await page.evaluate(() =>
+      Promise.all(document.getAnimations().map((animation) => animation.finished.catch(() => {}))),
+    )
     const failures = await page.evaluate(() => {
       const out = []
       if (
@@ -178,6 +181,7 @@ try {
   await page.getByLabel('Mostrar hábitos').uncheck()
   await page.getByLabel('Mostrar tarefas').uncheck()
   await page.keyboard.press('Escape')
+  await page.locator('.settings-dialog').waitFor({ state: 'hidden' })
   await checkLayout()
   assert.equal(
     await page.locator('.agenda').evaluate((el) => el.getBoundingClientRect().width),
@@ -187,6 +191,7 @@ try {
   await page.getByLabel('Mostrar hábitos').check()
   await page.getByLabel('Mostrar tarefas').check()
   await page.keyboard.press('Escape')
+  await page.locator('.settings-dialog').waitFor({ state: 'hidden' })
   await checkLayout()
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.locator('.agenda-viewport').evaluate((el) => (el.scrollTop = 0))

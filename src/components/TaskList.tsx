@@ -12,6 +12,7 @@ import type { DataSource, GoogleTaskList, Task } from '../types'
 import { taskService } from '../services/taskService'
 import { taskDueLabel } from '../services/dateService'
 import { useDashboardSettings } from '../hooks/useDashboardSettings'
+import { useAnimatedList } from '../hooks/useAnimatedList'
 import { useAutoTaskScroll } from '../hooks/useAutoTaskScroll'
 import { SectionHeader } from './SectionHeader'
 import { DetailText } from './DetailText'
@@ -113,6 +114,7 @@ export function TaskList({
   const measureKey = ordered
     .map((task) => `${task.id}:${task.completed}:${task.due ?? ''}`)
     .join('|')
+  useAnimatedList(taskViewport, measureKey, selectedListId)
   const scroll = useAutoTaskScroll({
     viewportRef: taskViewport,
     resetKey: selectedListId || 'local',
@@ -447,6 +449,7 @@ export function TaskList({
           <li
             key={task.id}
             className={`${task.completed ? 'completed' : ''} ${updated === task.id ? 'task-updated' : ''}`}
+            data-motion-id={task.id}
             data-task-pending={!task.completed || undefined}
           >
             <div className="task-click">

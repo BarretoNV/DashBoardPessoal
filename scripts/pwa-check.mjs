@@ -89,6 +89,7 @@ try {
     await page.screenshot({ path: `artifacts/pwa/settings-${width}.png`, fullPage: true })
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))
     await page.keyboard.press('Escape')
+    await page.locator('.settings-dialog').waitFor({ state: 'hidden' })
   }
   // A reduced visual viewport approximates keyboard space; a physical keyboard remains manual QA.
   await page.setViewportSize({ width: 360, height: 400 })
@@ -99,6 +100,7 @@ try {
     .fill('Verificação mobile')
   await page.screenshot({ path: 'artifacts/pwa/keyboard-space.png', fullPage: true })
   await page.keyboard.press('Escape')
+  await page.locator('.settings-dialog').waitFor({ state: 'hidden' })
   await page.emulateMedia({ media: 'screen' })
   await page.evaluate(() => fetch('/api/health'))
   await page.evaluate(() => fetch('/api/login/callback'))

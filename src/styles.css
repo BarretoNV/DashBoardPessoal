@@ -21,6 +21,11 @@
   --radius-field: 16px;
   --radius-control: 14px;
   --space: 16px;
+  --motion-quick: 140ms;
+  --motion-base: 240ms;
+  --motion-slow: 340ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --mono: Inter, system-ui, sans-serif;
   color: var(--text);
   background: var(--background);
@@ -45,8 +50,11 @@ button {
   cursor: pointer;
   color: inherit;
   transition:
-    background-color 0.18s,
-    border-color 0.18s;
+    scale var(--motion-base) var(--ease-out),
+    background-color var(--motion-quick) ease-out,
+    border-color var(--motion-quick) ease-out,
+    color var(--motion-quick) ease-out,
+    opacity var(--motion-base) ease-out;
 }
 button:disabled {
   cursor: not-allowed;
@@ -216,7 +224,8 @@ a {
   clip-path: inset(50%);
 }
 .ambient-hidden {
-  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 .weather {
   width: 210px;
@@ -1267,5 +1276,180 @@ a {
   :root:has(.sync-bar) .panel {
     padding-top: 6px;
     padding-bottom: 6px;
+  }
+}
+
+/* Motion is tied to an action, with no permanent animation loops. */
+:where(
+  button,
+  .icon-button,
+  .secondary-button,
+  .primary-action,
+  .weather-external,
+  .event-external
+) {
+  transition:
+    scale var(--motion-base) var(--ease-out),
+    background-color var(--motion-quick) ease-out,
+    border-color var(--motion-quick) ease-out,
+    color var(--motion-quick) ease-out,
+    opacity var(--motion-base) ease-out;
+}
+:where(
+    button,
+    .icon-button,
+    .secondary-button,
+    .primary-action,
+    .weather-external,
+    .event-external
+  ):active:not(:disabled) {
+  scale: 0.96;
+  transition-duration: 80ms;
+}
+.icon-button,
+.ambient-button {
+  transition:
+    scale var(--motion-base) var(--ease-out),
+    opacity var(--motion-base) ease-out,
+    background-color var(--motion-quick) ease-out;
+}
+.task-checkbox::before,
+.habit-dot {
+  transition:
+    background-color var(--motion-base) ease-out,
+    border-color var(--motion-base) ease-out,
+    scale var(--motion-base) var(--ease-out);
+}
+.task-checkbox:active::before,
+.day-cell:active .habit-dot {
+  scale: 0.88;
+}
+.task-checkbox:checked::after,
+.habit-dot.done svg {
+  animation: check-settle var(--motion-base) var(--ease-out);
+}
+.completed .text-ellipsis {
+  transition: color var(--motion-base) ease-out;
+}
+.task-list > li {
+  transition: background-color var(--motion-slow) ease-out;
+}
+.progress-track > span {
+  transition: width var(--motion-slow) var(--ease-out);
+}
+.task-list-trigger svg {
+  transition: transform var(--motion-base) var(--ease-out);
+}
+.task-list-menu,
+.task-create-popover {
+  transform-origin: top right;
+  animation: surface-arrive var(--motion-base) var(--ease-out);
+}
+.task-list-menu {
+  transform-origin: top left;
+}
+.task-list-enter {
+  animation: content-reveal var(--motion-base) ease-out;
+}
+.habit-page,
+.settings-tab-content {
+  animation: content-arrive var(--motion-base) var(--ease-out);
+}
+.settings-dialog {
+  transform-origin: center;
+  animation: surface-arrive var(--motion-slow) var(--ease-out);
+}
+.settings-dialog::backdrop {
+  animation: content-reveal var(--motion-base) ease-out;
+}
+.settings-dialog.is-closing {
+  pointer-events: none;
+  animation: surface-leave 160ms var(--ease-in) forwards;
+}
+.settings-dialog.is-closing::backdrop {
+  animation: content-reveal 160ms ease-in reverse forwards;
+}
+.forecast-popover {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity var(--motion-base) ease-out,
+    transform var(--motion-base) var(--ease-out),
+    display var(--motion-base) allow-discrete,
+    overlay var(--motion-base) allow-discrete;
+}
+.forecast-popover:popover-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+@starting-style {
+  .forecast-popover:popover-open {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+@keyframes surface-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes surface-leave {
+  to {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+}
+@keyframes content-reveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes content-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes check-settle {
+  from {
+    opacity: 0;
+    scale: 0.65;
+  }
+  70% {
+    opacity: 1;
+    scale: 1.08;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .forecast-popover {
+    transform: none;
+  }
+  :where(button, a):active:not(:disabled),
+  .task-checkbox:active::before,
+  .day-cell:active .habit-dot {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::backdrop {
+    animation: none !important;
+    transition: none !important;
   }
 }

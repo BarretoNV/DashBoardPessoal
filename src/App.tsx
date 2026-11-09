@@ -81,6 +81,8 @@ export default function App() {
           </button>
           <button
             className={`icon-button fullscreen-button ${ambient ? 'ambient-hidden' : ''}`}
+            inert={ambient}
+            aria-hidden={ambient || undefined}
             aria-label={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'}
             onClick={async () => {
               try {
@@ -101,6 +103,8 @@ export default function App() {
           </button>
           <button
             className={`icon-button ${ambient ? 'ambient-hidden' : ''}`}
+            inert={ambient}
+            aria-hidden={ambient || undefined}
             aria-label="Abrir configurações"
             onClick={() => setTab('settings')}
           >
