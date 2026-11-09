@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { Eye, EyeOff, Maximize, Minimize, Settings2 } from 'lucide-react'
 import { toggleHabitDay } from './services/habitService'
+import { getCloudSnapshot, subscribeCloud } from './services/cloudDashboard'
 import { Clock } from './components/Clock'
 import { BatteryIndicator } from './components/BatteryIndicator'
 import { Weather } from './components/Weather'
@@ -18,6 +19,7 @@ import { useDashboardSettings } from './hooks/useDashboardSettings'
 import { useGoogleConnection } from './hooks/useGoogleConnection'
 import { useIdleAmbient } from './hooks/useIdleAmbient'
 export default function App() {
+  const cloud = useSyncExternalStore(subscribeCloud, getCloudSnapshot)
   const now = useClock()
   const calendar = useCalendar(now)
   const tasks = useTasks()
@@ -173,7 +175,7 @@ export default function App() {
           />
         )}
       </DashboardLayout>
-      {(!saved || !tasks.saved || !habits.saved || !google.saved) && (
+      {cloud.mode === 'local' && (!saved || !tasks.saved || !habits.saved || !google.saved) && (
         <p className="save-notice" role="status">
           Não foi possível salvar. Suas alterações durarão apenas nesta sessão.
         </p>
